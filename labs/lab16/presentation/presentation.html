@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru-RU" xml:lang="ru-RU">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Абакумова О. М." />
+  <title>Лабораторная работа 16. Задачи оптимизации. Модель двух стратегий обслуживания</title>
+  <style>
+    html {
+      font-family: Open Sans Light;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  
+  
+  
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Лабораторная работа 16. Задачи оптимизации. Модель
+двух стратегий обслуживания</h1>
+<p class="author">Абакумова О. М.</p>
+</header>
+<h1 id="информация">Информация</h1>
+<h2 id="докладчик">Докладчик</h2>
+<div class="columns" data-align="center">
+<div class="column" style="width:70%;">
+<ul>
+<li>Абакумова Олеся Максимовна</li>
+<li>Студентка</li>
+<li>Российский университет дружбы народов</li>
+<li>1132220832@pfur.ru</li>
+<li><a href="https://github.com/omabakumova"
+class="uri">https://github.com/omabakumova</a></li>
+</ul>
+</div><div class="column" style="width:30%;">
+<p><img src="./image/abakumova.png" /></p>
+</div>
+</div>
+<h1 id="цель-работы">Цель работы</h1>
+<p>Изучить принципы работы GPSS для реализации моделей двух стратегий
+обслуживания.</p>
+<h1 id="постановка-задачи">Постановка задачи</h1>
+<p>На пограничном контрольно-пропускном пункте транспорта имеются 2
+пункта пропуска. Интервалы времени между поступлением автомобилей имеют
+экспоненциальное распределение со средним значением μ. Время прохождения
+автомобилями пограничного контроля имеет равномерное распределение на
+интервале <span class="math inline">[<em>a</em>, <em>b</em>]</span>.
+Предлагается две стратегии обслуживания прибывающих автомобилей:</p>
+<ol type="1">
+<li><p>Автомобили образуют две очереди и обслуживаются соответствующими
+пунктами пропуска;</p></li>
+<li><p>автомобили образуют одну общую очередь и обслуживаются
+освободившимся пунктом пропуска.</p></li>
+</ol>
+<p>Исходные данные: <span class="math inline"><em>μ</em></span> = 1, 75
+мин, <span class="math inline"><em>a</em></span> = 1 мин, <span
+class="math inline"><em>b</em></span> = 7 мин.</p>
+<h1 id="построение-модели">Построение модели</h1>
+<p>Целью моделирования является определение:</p>
+<ul>
+<li><p>характеристик качества обслуживания автомобилей, в частности,
+средних длин очередей; среднего времени обслуживания автомобиля;
+среднего времени пребывания автомобиля на пункте пропуска;</p></li>
+<li><p>наилучшей стратегии обслуживания автомобилей на пункте
+пограничного контроля;</p></li>
+<li><p>оптимального количества пропускных пунктов.</p></li>
+</ul>
+<h2 id="построение-модели-1">Построение модели</h2>
+<p>В качестве критериев, используемых для сравнения стратегий
+обслуживания автомобилей, выберем:</p>
+<ul>
+<li><p>коэффициенты загрузки системы;</p></li>
+<li><p>максимальные и средние длины очередей;</p></li>
+<li><p>средние значения времени ожидания обслуживания.</p></li>
+</ul>
+<h2 id="построение-модели-2">Построение модели</h2>
+<figure id="fig:001">
+<img src="image/1.png" style="width:50.0%"
+alt="Код модели 1 стратегии" />
+<figcaption aria-hidden="true">Код модели 1 стратегии</figcaption>
+</figure>
+<h2 id="построение-модели-3">Построение модели</h2>
+<figure id="fig:002">
+<img src="image/2.png" style="width:25.0%"
+alt="Отчёт по модели 1 стратегии" />
+<figcaption aria-hidden="true">Отчёт по модели 1 стратегии</figcaption>
+</figure>
+<h1 id="задание">Задание</h1>
+<ol type="1">
+<li><p>Составить модель для второй стратегии обслуживания, когда
+прибывающие автомобили образуют одну очередь и обслуживаются
+освободившимся пропускным пунктом;</p></li>
+<li><p>Свести полученные статистики моделирования в таблицу</p></li>
+<li><p>По результатам моделирования сделать вывод о наилучшей стратегии
+обслуживания автомобилей;</p></li>
+</ol>
+<h2 id="задание-1">Задание</h2>
+<ol start="4" type="1">
+<li>Изменив модели, определить оптимальное число пропускных пунктов (от
+1 до 4) для каждой стратегии при условии, что:</li>
+</ol>
+<ul>
+<li><p>коэффициент загрузки пропускных пунктов принадлежит интервалу [0,
+5; 0, 95];</p></li>
+<li><p>среднее число автомобилей, одновременно находящихся на
+контрольно-пропускном пункте, не должно превышать 3;</p></li>
+<li><p>среднее время ожидания обслуживания не должно превышать 4
+мин.</p></li>
+</ul>
+<h1 id="выполнение-лабораторной-работы">Выполнение лабораторной
+работы</h1>
+<figure id="fig:003">
+<img src="image/3.png" style="width:50.0%"
+alt="Код модели для второй стратегии обслуживания" />
+<figcaption aria-hidden="true">Код модели для второй стратегии
+обслуживания</figcaption>
+</figure>
+<h2 id="выполнение-лабораторной-работы-1">Выполнение лабораторной
+работы</h2>
+<figure id="fig:004">
+<img src="image/4.png" style="width:50.0%"
+alt="Отчет по модели для второй стратегии обслуживания" />
+<figcaption aria-hidden="true">Отчет по модели для второй стратегии
+обслуживания</figcaption>
+</figure>
+<h2 id="выполнение-лабораторной-работы-2">Выполнение лабораторной
+работы</h2>
+<table>
+<caption>Сравнение стратегий</caption>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 17%" />
+<col style="width: 12%" />
+<col style="width: 13%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th>Показатель</th>
+<th>стратегия 1</th>
+<th></th>
+<th></th>
+<th>стратегия 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>пункт 1</td>
+<td>пункт 2</td>
+<td>в целом</td>
+<td></td>
+</tr>
+<tr>
+<td>Поступило автомобилей</td>
+<td>2928</td>
+<td>2925</td>
+<td>5853</td>
+<td>5719</td>
+</tr>
+<tr>
+<td>Обслужено автомобилей</td>
+<td>2540</td>
+<td>2536</td>
+<td>5076</td>
+<td>5049</td>
+</tr>
+<tr>
+<td>Коэффициент загрузки</td>
+<td>0,997</td>
+<td>0,996</td>
+<td>0,9965</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Максимальная длина очереди</td>
+<td>393</td>
+<td>393</td>
+<td>786</td>
+<td>668</td>
+</tr>
+<tr>
+<td>Средняя длина очереди</td>
+<td>187,098</td>
+<td>187,114</td>
+<td>374,212</td>
+<td>344,466</td>
+</tr>
+<tr>
+<td>Среднее время ожидания</td>
+<td>644,107</td>
+<td>644,823</td>
+<td>644,465</td>
+<td>607,138</td>
+</tr>
+</tbody>
+</table>
+<h2 id="выполнение-лабораторной-работы-3">Выполнение лабораторной
+работы</h2>
+<figure id="fig:005">
+<img src="image/5.png" style="width:50.0%"
+alt="Код модели 2 стратегии с 1 пропуском" />
+<figcaption aria-hidden="true">Код модели 2 стратегии с 1
+пропуском</figcaption>
+</figure>
+<h2 id="выполнение-лабораторной-работы-4">Выполнение лабораторной
+работы</h2>
+<figure id="fig:006">
+<img src="image/6.png" style="width:50.0%"
+alt="Отчет по 2 стратегии с 1 пропуском" />
+<figcaption aria-hidden="true">Отчет по 2 стратегии с 1
+пропуском</figcaption>
+</figure>
+<h2 id="выполнение-лабораторной-работы-5">Выполнение лабораторной
+работы</h2>
+<figure id="fig:007">
+<img src="image/7.png" style="width:50.0%"
+alt="Код модели 2 стратегии с 3 пропусками" />
+<figcaption aria-hidden="true">Код модели 2 стратегии с 3
+пропусками</figcaption>
+</figure>
+<h2 id="выполнение-лабораторной-работы-6">Выполнение лабораторной
+работы</h2>
+<figure id="fig:008">
+<img src="image/8.png" style="width:30.0%"
+alt="Отчет по 2 стратегии с 3 пропусками" />
+<figcaption aria-hidden="true">Отчет по 2 стратегии с 3
+пропусками</figcaption>
+</figure>
+<h2 id="выполнение-лабораторной-работы-7">Выполнение лабораторной
+работы</h2>
+<figure id="fig:009">
+<img src="image/9.png" style="width:50.0%"
+alt="Код модели 2 стратегии с 4 пропусками" />
+<figcaption aria-hidden="true">Код модели 2 стратегии с 4
+пропусками</figcaption>
+</figure>
+<h2 id="выполнение-лабораторной-работы-8">Выполнение лабораторной
+работы</h2>
+<figure id="fig:010">
+<img src="image/10.png" style="width:35.0%"
+alt="Отчет по 2 стратегии с 4 пропусками" />
+<figcaption aria-hidden="true">Отчет по 2 стратегии с 4
+пропусками</figcaption>
+</figure>
+<h2 id="выполнение-лабораторной-работы-9">Выполнение лабораторной
+работы</h2>
+<figure id="fig:011">
+<img src="image/11.png" style="width:35.0%"
+alt="Код модели 1 стратегии с 3 пропусками" />
+<figcaption aria-hidden="true">Код модели 1 стратегии с 3
+пропусками</figcaption>
+</figure>
+<h2 id="выполнение-лабораторной-работы-10">Выполнение лабораторной
+работы</h2>
+<figure id="fig:012">
+<img src="image/12.png" style="width:35.0%"
+alt="Отчет по 1 стратегии с 3 пропусками" />
+<figcaption aria-hidden="true">Отчет по 1 стратегии с 3
+пропусками</figcaption>
+</figure>
+<h2 id="выполнение-лабораторной-работы-11">Выполнение лабораторной
+работы</h2>
+<figure id="fig:013">
+<img src="image/13.png" style="width:25.0%"
+alt="Код модели 1 стратегии с 4 пропусками" />
+<figcaption aria-hidden="true">Код модели 1 стратегии с 4
+пропусками</figcaption>
+</figure>
+<h2 id="выполнение-лабораторной-работы-12">Выполнение лабораторной
+работы</h2>
+<figure id="fig:014">
+<img src="image/14.png" style="width:35.0%"
+alt="Отчет по 1 стратегии с 4 пропусками" />
+<figcaption aria-hidden="true">Отчет по 1 стратегии с 4
+пропусками</figcaption>
+</figure>
+<h2 id="выполнение-лабораторной-работы-13">Выполнение лабораторной
+работы</h2>
+<table>
+<caption>Сравнение стратегий с пунктами</caption>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 7%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr>
+<th>Показатель</th>
+<th>1 п.</th>
+<th>С1, 2п.</th>
+<th>С2, 2п.</th>
+<th>С1, 3п.</th>
+<th>С2, 3п.</th>
+<th>С1, 4п.</th>
+<th>С2, 4п.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Загрузка</td>
+<td>1.000</td>
+<td>0.9965</td>
+<td>1.000</td>
+<td>0.752</td>
+<td>0.748</td>
+<td>0.5675</td>
+<td>0.563</td>
+</tr>
+<tr>
+<td>Авто в очереди</td>
+<td>1618</td>
+<td>376.2</td>
+<td>346.4</td>
+<td>4.172</td>
+<td>3.306</td>
+<td>3.36</td>
+<td>2.447</td>
+</tr>
+<tr>
+<td>Время ожидания</td>
+<td>2838</td>
+<td>644.5</td>
+<td>607.1</td>
+<td>3.354</td>
+<td>1.885</td>
+<td>1.923</td>
+<td>0.341</td>
+</tr>
+</tbody>
+</table>
+<h2 id="выполнение-лабораторной-работы-14">Выполнение лабораторной
+работы</h2>
+<ol type="1">
+<li><strong>Эффективность стратегий</strong>:</li>
+</ol>
+<ul>
+<li>Стратегия 2 демонстрирует лучшие показатели по сравнению со
+Стратегией 1, особенно в сокращении среднего времени ожидания. Например,
+при использовании 4 пунктов пропуска время ожидания уменьшается до 0.341
+минуты, что в 5 раз меньше, чем у Стратегии 1 (1.923 минуты).</li>
+</ul>
+<ol start="2" type="1">
+<li><strong>Оптимальное количество пунктов пропуска</strong>:</li>
+</ol>
+<ul>
+<li><p><strong>4 пункта</strong>: Обе стратегии с 4 пунктами
+соответствуют критериям задания, обеспечивая низкий коэффициент загрузки
+и минимальное время ожидания.</p></li>
+<li><p><strong>3 пункта</strong>: Только Стратегия 2 с 3 пунктами
+показывает приемлемые результаты, близкие к варианту с 4
+пунктами.</p></li>
+</ul>
+<h1 id="выводы">Выводы</h1>
+<p>В процессе выполнения данной лабораторной работы я изучила приципы
+работы GPSS для реализации моделей двух стратегий обслуживания.</p>
+</body>
+</html>
